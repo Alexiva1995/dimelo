@@ -21,5 +21,10 @@ Theme.create('DEFAULT', {
             dark:'#9bdf52',
         },
     },
+    typography:{
+        fontFamily:'Source Sans Pro',
+        fontWeightBold:'bold',
+        fontWeightRegular:'bold',
+    },
 })
 // Theme.use('ThemeName');
