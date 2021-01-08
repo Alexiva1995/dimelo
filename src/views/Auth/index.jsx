@@ -4,12 +4,13 @@ import {
     Hidden,
     makeStyles,
     Typography,
-    Container,
 } from '@material-ui/core';
 import WatermarkIMG from '../../dist/images/watermark.svg';
 import BrandIMG from '../../dist/images/brand.svg';
-import SignIn from './forms/signin';
 import { Switch, Route } from 'react-router-dom';
+
+import SignIn from './forms/signin';
+import SignUp from './forms/signup';
 
 
 
@@ -54,19 +55,19 @@ export default function Login(req){
     const classes = useStyles();
     return (<Grid container className={classes.root}>
         <Hidden smDown>
-            <Grid item md={6} className={classes.gridLeft}>
+            <Grid item xs={12} md={6} className={classes.gridLeft}>
                 <Typography variant="h3">Bienvenido</Typography>
-                <Typography variant="subtitle2">¡Bienvenido! Por favor, ingrese a su cuenta.</Typography>
+                <Typography variant="subtitle2">
+                    {req.path==='/sigin' ? '¡Bienvenido! Por favor, ingrese a su cuenta.' : 'Completa el registro.'}
+                </Typography>
             </Grid>
         </Hidden>
         <Grid item xs={12} md={6} className={classes.gridRight}>
-            <Container maxWidth="xs">
-                <Switch>
-                    <Route path="/signin" component={SignIn} />
-                    {/* <Route path="/signup" /> */}
-                    {/* <Route path="/forgot" /> */}
-                </Switch>
-            </Container>
+            <Switch>
+                <Route path="/signin" component={SignIn} />
+                <Route path="/signup" component={SignUp} />
+                {/* <Route path="/forgot" /> */}
+            </Switch>
         </Grid>
     </Grid>);
 }

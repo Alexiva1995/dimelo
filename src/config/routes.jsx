@@ -1,5 +1,9 @@
 import { Route } from '@arcaela/aurora';
-import Login from '../views/Login'
+import Auth from '../views/Auth'
+
+Route.case = (cases, Component)=>cases.map(path=>Route(path, Component));
+
+
 /*
     El uso de Route está designado a la construcción de Vistas dinámicas
     con renderizado en tiempo real;
@@ -26,10 +30,7 @@ import Login from '../views/Login'
 
 
 Route.redirect('/', '/signin');
-
-Route('/signin', Login);
-Route('/signup', Login);
-Route('/forgot', Login);
+Route.case([ '/signin', '/signup', '/forgot', ], Auth);
 
 // Route('/', <Welcome />);
 // Route('/welcome', (req)=>req.redirect('/'));

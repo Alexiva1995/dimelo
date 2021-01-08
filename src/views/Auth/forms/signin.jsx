@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Checkbox, FormControl, Grid, IconButton, Input, InputAdornment, InputLabel, makeStyles, TextField, Toolbar, Typography } from '@material-ui/core';
+import { Button, Checkbox, Container, FormControl, Grid, IconButton, Input, InputAdornment, InputLabel, makeStyles, TextField, Toolbar, Typography } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 
@@ -35,7 +35,7 @@ const useStyles = makeStyles({
 export default function SignIn(){
     const [ showPass, setShowPass ] = React.useState(null);
     const classes = useStyles();
-    return (<React.Fragment>
+    return (<Container maxWidth="xs">
     <Grid container direction="column" alignItems="center" justify="flex-end" className={classes.root}>
         <Grid item xs={12}>
             <Typography color="primary" variant="h3">Iniciar sesión</Typography>
@@ -69,6 +69,6 @@ export default function SignIn(){
     </Grid>
     <Toolbar className={classes.Toolbar}>
         ¿Aun no tienes una cuenta? &nbsp; <Typography component={Link} to="/signup">Registrate</Typography>
-    </Toolbar>
-    </React.Fragment>);
+    </Toolbar>        
+    </Container>);
 }
