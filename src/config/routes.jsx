@@ -25,8 +25,12 @@ import Login from '../views/Login'
 
 
 
-Route.redirect('/', '/login');
-Route('/login', Login);
+Route.redirect('/', '/signin');
+
+Route('/signin', Login);
+Route('/signup', Login);
+Route('/forgot', Login);
+
 // Route('/', <Welcome />);
 // Route('/welcome', (req)=>req.redirect('/'));
 // Route('/', (req)=><Welcome tab="modal-card" {...req} />);

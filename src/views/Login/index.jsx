@@ -1,24 +1,23 @@
 import React from 'react'
 import {
     Grid,
+    Hidden,
     makeStyles,
     Typography,
-    TextField,
-    Hidden,
-    Button,
+    Container,
 } from '@material-ui/core';
-
 import WatermarkIMG from '../../dist/images/watermark.svg';
 import BrandIMG from '../../dist/images/brand.svg';
+import SignIn from './forms/signin';
+import { Switch, Route } from 'react-router-dom';
+
+
 
 const useStyles = makeStyles(theme=>({
     root:{
         width:'100vw',
         height:'100vh',
-        ' & > .MuiGrid-item':{ height:'100%', },
-        fontFamily:'Source Sans Pro',
     },
-
     gridLeft:{
         padding:'100px 83px',
         backgroundRepeat:'no-repeat',
@@ -37,30 +36,21 @@ const useStyles = makeStyles(theme=>({
             font:'normal normal 300 20px/25px Source Sans Pro',
         },
     },
-
-
     gridRight:{
         margin:'auto',
-        maxHeight:386,
-        display:'flex',
-        background:'#f00',
-        flexDirection:'column',
-        maxWidth:'fit-content',
-        padding:'10px 20px',
-        justifyContent:'space-between',
-        // color:'#43425D',
-        // cursor:'default',
-        // fontWeight:'300',
-        // '& a':{ textDecoration:'none',color:'inherit' },
-        // '& .MuiInputLabel-formControl:not(.Mui-focused)':{ fontSize:15, },
-        // '& > .MuiFormControl-root':{ marginTop:10, display:'flex', flexGrow:1, },
+        color:'#43425D',
+        cursor:'default',
+        fontWeight:'300',
+        height:'100%',
+        '& a':{ textDecoration:'none',color:'inherit' },
+        '& > .MuiContainer-root':{
+            height:'100%',
+            display:'flex',
+            flexDirection:'column',
+        },
     },
-
 }));
-
-
-
-export default function Login(){
+export default function Login(req){
     const classes = useStyles();
     return (<Grid container className={classes.root}>
         <Hidden smDown>
@@ -69,19 +59,14 @@ export default function Login(){
                 <Typography variant="subtitle2">¡Bienvenido! Por favor, ingrese a su cuenta.</Typography>
             </Grid>
         </Hidden>
-
         <Grid item xs={12} md={6} className={classes.gridRight}>
-            <Typography color="primary" variant="h3">Iniciar sesión</Typography>
-              <TextField color="primary" fullWidth id="input-user" label="Usuario" />
-              <TextField color="primary" fullWidth id="input-user" label="Contraseña" />
-              <Grid container>
-                <Grid item xs={6}> <a href="/forgot"> Recordarme </a> </Grid>
-                <Grid item xs={6}> <a href="/forgot"> Olvide mi contraseña </a> </Grid>
-              </Grid>
-              <Button>
-
-              </Button>
+            <Container maxWidth="xs">
+                <Switch>
+                    <Route path="/signin" component={SignIn} />
+                    {/* <Route path="/signup" /> */}
+                    {/* <Route path="/forgot" /> */}
+                </Switch>
+            </Container>
         </Grid>
-
     </Grid>);
 }
