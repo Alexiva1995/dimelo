@@ -116,8 +116,22 @@ export default function SignUpMore(req){
                 setGlobalError(data.message);
                 Object.keys(data.errors).forEach(key=>setErrors(key, data.errors[key][0]));
             }
+            else{
+                fetch("http://dimelo.vip/dimelo/api/auth/logout", {
+                    method: 'GET',
+                    headers:{
+                        "Accept":"application/json",
+                        "Content-Type":"application/x-www-form-urlencoded",
+                        "Authorization":`Bearer ${data.access_token}`,
+                    },
+                    redirect: 'follow'
+                })
+                .then((data)=>{ console.log(data); })
+                // .then(response=>req.history.replace('/signup'))
+            }
         });
-    };
+    }
+
     return (<div className={classes.root}>
         <Container maxWidth="sm" className={classes.container}>
             <img alt="Brand" src={BrandPNG} className={classes.brand} />
@@ -153,8 +167,8 @@ export default function SignUpMore(req){
             </Toolbar>)}
             <div className={classes.actions}>
                 <div className={`active-step-${activeStep}`}> <FiberManualRecord /> <FiberManualRecord /> <FiberManualRecord /> </div>
-                { activeStep<2 ? <Button variant="contained" disabled={validate(false)} color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
-                { activeStep>=2? <Button variant="contained" disabled={validate()} color="secondary" onClick={handleSignUp} >
+                { activeStep<2 ? <Button variant="contained" disabled={!validate(true)} color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
+                { activeStep>=2? <Button variant="contained" disabled={!validate()} color="secondary" onClick={handleSignUp} >
                     <Typography color="inherit" component="span">Registrate</Typography>
                 </Button>:null}
             </div>

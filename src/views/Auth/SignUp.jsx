@@ -56,7 +56,29 @@ const useStyles = makeStyles({
 
 
 const InputsHelperBackup = {
-    inputs:{},
+    inputs:{
+        username:'arcaela',
+        password:'arcaelas123',
+        name:'Alejandro',
+        lastname:'Reyes',
+        cedula:"26001714",
+        age:"25",
+
+        address:'Venezuela',
+        reside_municipality:'Caroni',
+        commune:'Cachamay',
+        neighborhood:'Orinoco',
+        phone:'02869224896',
+        cell_phone:'04144709840',
+        email:'arcaela12@gmail.com',
+
+        voting_municipality:'Cachamay',
+        voting_point:'Caroni',
+        voting_table:'No lo se',
+
+        number_people_legal_age:"1",
+        number_people_accompany_to_vote:"1",
+    },
     errors:{},
 };
 function InputHooks(){
@@ -94,10 +116,10 @@ function InputHooks(){
             },
         };
     };
-    const validate = (withFails=true)=>{
+    const validate = (onlyErrors=false)=>{
         const empty = requires.filter(e=>!(e in inputs)).length>0;
         const fails = Object.values(errors).filter(e=>e).length>0;
-        return Boolean(!empty&&(withFails?fails:true));
+        return onlyErrors?!fails:(!fails&&!empty);
     };
     return {
         inputs,
