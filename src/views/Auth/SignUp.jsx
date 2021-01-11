@@ -55,15 +55,62 @@ const useStyles = makeStyles({
 
 
 
+const InputsHelperBackup = {
+    inputs:{},
+    errors:{},
+};
+function InputHooks(){
+    const [inputs,_setInputs] = React.useState(InputsHelperBackup.inputs);
+    const setInputs = (key, value)=>{InputsHelperBackup.inputs[key]=value;return _setInputs(prev=>({...prev,...InputsHelperBackup.inputs}));};
+    const [errors,_setErrors] = React.useState(InputsHelperBackup.errors);
+    const setErrors = (key, value)=>{InputsHelperBackup.errors[key]=value;return _setErrors(prev=>({...prev,...InputsHelperBackup.errors}));};
+    const requires = [];
+    const inputProps = (key)=>{
+        requires.push(key);
+        return {
+            name:key,
+            required:true,
+            fullWidth:true,
+            id:`input-${key}`,
+            defaultValue:inputs[key],
+            error:Boolean(errors[key]),
+            ...(key!=='password'?{helperText:errors[key]}:{}),
+            onChange:({target:{name, value}})=>setInputs(name, value),
+            onBlur:({target:{name, value}})=>{
+                if((['email','username','cedula']).indexOf(name)>=0){
+                    setErrors(name, null);
+                    fetch(`https://dimelo.vip/dimelo/api/auth/chek-${name}`, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        body: JSON.stringify(inputs),
+                        headers: new Headers({ "Accept":"application/json", "Content-Type":"application/json" }),
+                    })
+                    .then(response => response.json(),err=>({...err,_error:true}))
+                    .then((data)=>{
+                        if(data._error || (data.message && data.message.indexOf('navailable')))
+                            setErrors(name, data.message);
+                    })
+                }
+            },
+        };
+    };
+    const validate = ()=>Boolean(requires.filter(key=>(!(key in inputs)||errors[key])).length);
+    return {
+        inputs,
+        setInputs,
+        errors,
+        setErrors,
+        validate,
+        inputProps,
+    };
+}
+
+
+export { InputHooks };
 export default function SignUp(req){
+    const { inputs, inputProps, validate } = InputHooks();
     const classes = useStyles();
     const [ showPass, setShowPass ] = React.useState(null);
-    const [ inputs, setInput ] = React.useState(req.location.state);
-    const inputProps = (key)=>({
-        defaultValue:inputs[key],
-        onChange:({target:{value}})=>setInput(prev=>({...prev, [key]:value})),
-    });
-
     return (<Container className={classes.root}>
         <div className={classes.header}>
             <Typography color="primary" variant="h3">Regístrate ahora</Typography>
@@ -72,12 +119,10 @@ export default function SignUp(req){
             </Typography>
         </div>
         <div className={classes.body}>
-            <TextField {...inputProps('user')} color="primary" fullWidth id="input-user" label="Usuario" />
-            <FormControl fullWidth>
+            <TextField {...inputProps('username')} label="Usuario" color="primary" />
+            <FormControl>
                 <InputLabel htmlFor="input-password">Contraseña</InputLabel>
-                <Input id="input-password"
-                    { ...inputProps('password') }
-                    type={showPass?'text':'password'}
+                <Input { ...inputProps('password') } type={showPass?'text':'password'}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -87,15 +132,15 @@ export default function SignUp(req){
                             </IconButton>
                         </InputAdornment>} />
             </FormControl>
-            <TextField {...inputProps('name')} color="primary" fullWidth id="input-name" label="Nombres" />
-            <TextField {...inputProps('lastname')} color="primary" fullWidth id="input-lastname" label="Apellidos" />
-            <TextField {...inputProps('document')} color="primary" fullWidth id="input-document" label="Cedula" />
-            <TextField {...inputProps('age')} color="primary" fullWidth id="input-age" label="Edad" />
+            <TextField {...inputProps('name')} color="primary" label="Nombres" />
+            <TextField {...inputProps('lastname')} color="primary" label="Apellidos" />
+            <TextField {...inputProps('cedula')} inputProps={{maxLength:10}} color="primary" label="Cedula" type="number" />
+            <TextField {...inputProps('age')} color="primary" label="Edad" type="number" />
             <div className="legend">
                 Al continuar acepto las&nbsp;<strong href="#">políticas de uso de datos y privacidad.</strong>
             </div>
             <div className="legend">
-                <Button variant="contained" disableElevation color="primary" className={classes.Button} onClick={()=>req.history.push('/signup-more', inputs)}>
+                <Button variant="contained" disabled={validate()} disableElevation color="primary" className={classes.Button} onClick={()=>req.history.push('/signup-more', inputs)}>
                     <Typography color="inherit" component="span">Continuar</Typography>
                 </Button>
             </div>
