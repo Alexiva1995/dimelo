@@ -87,14 +87,18 @@ function InputHooks(){
                     })
                     .then(response => response.json(),err=>({...err,_error:true}))
                     .then((data)=>{
-                        if(data._error || (data.message && data.message.indexOf('navailable')))
+                        if(data._error || (data.message && data.message.indexOf('navailable')>=0))
                             setErrors(name, data.message);
                     })
                 }
             },
         };
     };
-    const validate = ()=>Boolean(requires.filter(key=>(!(key in inputs)||errors[key])).length);
+    const validate = (withFails=true)=>{
+        const empty = requires.filter(e=>!(e in inputs)).length>0;
+        const fails = Object.values(errors).filter(e=>e).length>0;
+        return Boolean(!empty&&(withFails?fails:true));
+    };
     return {
         inputs,
         setInputs,

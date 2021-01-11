@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme=>({
             fontWeight:'300',
         },
     },
-    body:{ margin:'auto 0', marginTop:30, },
+    body:{ margin:'auto 0', _marginTop:30, },
     hasStep:{
         display:'flex',
         flexWrap:'wrap',
@@ -95,8 +95,9 @@ const InputWhite = withStyles({
 export default function SignUpMore(req){
     const classes = useStyles();
     const { inputs, inputProps, validate, setErrors } = InputHooks();
-
     const [ activeStep, setActiveStep ] = React.useState(0);
+    const [ globalError, setGlobalError ] = React.useState('');
+
     const handleBack = ()=>{
         if(activeStep===0) req.history.goBack();
         else setActiveStep(n=>n-1);
@@ -110,14 +111,13 @@ export default function SignUpMore(req){
             method: 'POST',
             body: JSON.stringify(inputs),
             redirect: 'follow',
-        }).then(response => response.json(), (err)=>{
-            Object.keys(err.errors).forEach(key=>setErrors(key, err.errors[key][0]));
-        }).then((data)=>{
-            console.log("Registrado: ", data);
+        }).then(response => response.json()).then((data)=>{
+            if(data.errors){
+                setGlobalError(data.message);
+                Object.keys(data.errors).forEach(key=>setErrors(key, data.errors[key][0]));
+            }
         });
     };
-
-
     return (<div className={classes.root}>
         <Container maxWidth="sm" className={classes.container}>
             <img alt="Brand" src={BrandPNG} className={classes.brand} />
@@ -148,9 +148,12 @@ export default function SignUpMore(req){
                     <InputWhite {...inputProps('number_people_accompany_to_vote')} fullWidth id="input-address" label="¿Con cuantas personas usted cuenta para que nos acompañen en la votacion?" type="number" inputProps={{style:{marginTop:15}}} />
                 </div>
             </div>
+            {globalError&&(<Toolbar className={classes.footer}>
+                <Typography variant="body2">{globalError}</Typography>
+            </Toolbar>)}
             <div className={classes.actions}>
                 <div className={`active-step-${activeStep}`}> <FiberManualRecord /> <FiberManualRecord /> <FiberManualRecord /> </div>
-                { activeStep<2 ? <Button variant="contained" color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
+                { activeStep<2 ? <Button variant="contained" disabled={validate(false)} color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
                 { activeStep>=2? <Button variant="contained" disabled={validate()} color="secondary" onClick={handleSignUp} >
                     <Typography color="inherit" component="span">Registrate</Typography>
                 </Button>:null}
