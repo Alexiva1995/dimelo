@@ -1,5 +1,10 @@
-import React from 'react'
 import clsx from 'clsx';
+import React from 'react'
+import { Link } from 'react-router-dom';
+import InputHooks from './InputsHelper';
+import BrandPNG from '../../dist/images/brand.svg';
+import { FiberManualRecord, } from '@material-ui/icons';
+import WatermarkIMG from '../../dist/images/watermark.svg';
 import {
     Button,
     Toolbar,
@@ -9,13 +14,6 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core'
-import WatermarkIMG from '../../dist/images/watermark.svg';
-import BrandPNG from '../../dist/images/brand.svg';
-import { Link } from 'react-router-dom';
-import {
-    FiberManualRecord,
-} from '@material-ui/icons';
-import { InputHooks } from './SignUp';
 
 
 
@@ -39,6 +37,23 @@ const useStyles = makeStyles(theme=>({
         justifyContent:'flex-start',
         backgroundColor:theme.palette.primary.main,
         '& > img':{ maxWidth:200, margin:'0 auto', marginTop:30, },
+    },
+
+    containerWelcome:{
+        margin:'auto',
+        color:'#FFF',
+        borderRadius:20,
+        padding:'20px',
+        display:'flex',
+        flexDirection:'column',
+        alignContent:'center',
+        justifyContent:'center',
+        textAlign:'center',
+        backgroundColor:theme.palette.primary.main,
+        '& > img':{ maxWidth:200, margin:'0 auto', marginTop:30, },
+        '& > .MuiTypography-h5':{ margin:'20px auto', },
+        '& > .MuiButton-root':{ margin:'40px auto',color:'#fff' },
+        '& > .MuiTypography-subtitle2':{ },
     },
     header:{
         marginTop:30,
@@ -92,11 +107,30 @@ const InputWhite = withStyles({
 })(TextField);
 
 
+
+
+function WelcomeComponent(){
+    const classes = useStyles();
+    return (<Container maxWidth="xs" className={classes.containerWelcome}>
+        <img alt="Brand" src={BrandPNG} className={classes.brand} />
+        <Typography variant="h5" color="initial">¡Registro exitoso!</Typography>
+        <Typography variant="subtitle2" color="initial">
+            Gracias por completar el registro.
+        </Typography>
+        <Button color="secondary" variant="contained" component={Link} to="/signup">
+            <Typography color="inherit" component="span">
+                Registrar otra persona
+            </Typography>
+        </Button>
+    </Container>);
+}
+
 export default function SignUpMore(req){
     const classes = useStyles();
-    const { inputs, inputProps, validate, setErrors } = InputHooks();
+    const { inputs, inputProps, isLocked, setErrors, resetInputs } = InputHooks(req.location.state);
     const [ activeStep, setActiveStep ] = React.useState(0);
     const [ globalError, setGlobalError ] = React.useState('');
+    const [ welcome, setWelcome ] = React.useState(false);
 
     const handleBack = ()=>{
         if(activeStep===0) req.history.goBack();
@@ -126,14 +160,15 @@ export default function SignUpMore(req){
                     },
                     redirect: 'follow'
                 })
-                .then((data)=>{ console.log(data); })
-                // .then(response=>req.history.replace('/signup'))
+                .then((data)=>{
+                    resetInputs({user:null});
+                    setWelcome(data);
+                })
             }
         });
     }
-
     return (<div className={classes.root}>
-        <Container maxWidth="sm" className={classes.container}>
+        {welcome?(<WelcomeComponent />):(<Container maxWidth="sm" className={classes.container}>
             <img alt="Brand" src={BrandPNG} className={classes.brand} />
             <div className={classes.header}>
                 <Typography variant="h5" color="initial">Un poco mas...</Typography>
@@ -167,15 +202,15 @@ export default function SignUpMore(req){
             </Toolbar>)}
             <div className={classes.actions}>
                 <div className={`active-step-${activeStep}`}> <FiberManualRecord /> <FiberManualRecord /> <FiberManualRecord /> </div>
-                { activeStep<2 ? <Button variant="contained" disabled={!validate(true)} color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
-                { activeStep>=2? <Button variant="contained" disabled={!validate()} color="secondary" onClick={handleSignUp} >
+                { activeStep<2 ? <Button variant="contained" disabled={isLocked(false)} color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
+                { activeStep>=2? <Button variant="contained" disabled={isLocked()} color="secondary" onClick={handleSignUp} >
                     <Typography color="inherit" component="span">Registrate</Typography>
                 </Button>:null}
             </div>
             <Toolbar className={classes.footer}>
                 ¿Ya tienes una cuenta?&nbsp;<Typography component={Link} to="/signin">Ingresa</Typography>
             </Toolbar>        
-        </Container>
+        </Container>)}
     </div>);
 
 }
