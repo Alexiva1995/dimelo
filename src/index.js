@@ -4,6 +4,6 @@ import { AuroraJS } from '@arcaela/aurora';
 import './config/themes'
 import './config/routes'
 
-ReactDOM.render(<React.StrictMode>
+ReactDOM.render((<React.StrictMode>
     <AuroraJS />
-</React.StrictMode>, document.getElementById('app'));
+</React.StrictMode>), document.getElementById('app'));

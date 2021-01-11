@@ -2,7 +2,6 @@ import React from 'react'
 import { Button, Checkbox, Container, FormControl, Grid, IconButton, Input, InputAdornment, InputLabel, makeStyles, TextField, Toolbar, Typography } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-
 const useStyles = makeStyles({
     root:{
         width:'100%',
@@ -12,7 +11,6 @@ const useStyles = makeStyles({
         '& > .MuiFormControl-root':{
             marginTop:30,
         },
-
     },
     Checkbox:{
         width:'100%',

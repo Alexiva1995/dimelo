@@ -137,7 +137,7 @@ export default function SignUpMore(req){
         else setActiveStep(n=>n-1);
     };
     const handleSignUp = ()=>{
-        return fetch("http://dimelo.vip/dimelo/api/auth/register",{
+        return fetch("https://dimelo.vip/dimelo/api/auth/register",{
             headers:new Headers({
                 "Accept":"application/json",
                 "Content-Type":"application/json",
@@ -151,7 +151,7 @@ export default function SignUpMore(req){
                 Object.keys(data.errors).forEach(key=>setErrors(key, data.errors[key][0]));
             }
             else{
-                fetch("http://dimelo.vip/dimelo/api/auth/logout", {
+                fetch("https://dimelo.vip/dimelo/api/auth/logout", {
                     method: 'GET',
                     headers:{
                         "Accept":"application/json",
