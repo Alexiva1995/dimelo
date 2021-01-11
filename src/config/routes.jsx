@@ -1,8 +1,7 @@
-import { Route } from '@arcaela/aurora';
+import { Route } from '@arcaela/aurora/hooks';
 import Auth from '../views/Auth'
 
 Route.case = (cases, Component)=>cases.map(path=>Route(path, Component));
-
 
 /*
     El uso de Route está designado a la construcción de Vistas dinámicas
@@ -30,8 +29,12 @@ Route.case = (cases, Component)=>cases.map(path=>Route(path, Component));
 
 
 Route.redirect('/', '/signin');
-Route.case([ '/signin', '/signup', '/forgot', ], Auth);
-
+Route.case([
+    '/signin',
+    '/signup',
+    '/signup-more',
+    '/forgot',
+], Auth);
 // Route('/', <Welcome />);
 // Route('/welcome', (req)=>req.redirect('/'));
 // Route('/', (req)=><Welcome tab="modal-card" {...req} />);

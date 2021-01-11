@@ -9,15 +9,17 @@ import WatermarkIMG from '../../dist/images/watermark.svg';
 import BrandIMG from '../../dist/images/brand.svg';
 import { Switch, Route } from 'react-router-dom';
 
-import SignIn from './forms/signin';
-import SignUp from './forms/signup';
+// Formularios
+import SignIn from './SignIn';
+import SignUp from './SignUp';
+import SignUpMore from './SignUpMore';
 
 
 
 const useStyles = makeStyles(theme=>({
     root:{
-        width:'100vw',
-        height:'100vh',
+        minWidth:'100vw',
+        minHeight:'100vh',
     },
     gridLeft:{
         padding:'100px 83px',
@@ -51,9 +53,12 @@ const useStyles = makeStyles(theme=>({
         },
     },
 }));
-export default function Login(req){
+
+export default function Auth(req){
     const classes = useStyles();
-    return (<Grid container className={classes.root}>
+return (req.location.pathname==='/signup-more')
+    ?<SignUpMore {...req} />
+    :(<Grid container className={classes.root}>
         <Hidden smDown>
             <Grid item xs={12} md={6} className={classes.gridLeft}>
                 <Typography variant="h3">Bienvenido</Typography>
@@ -64,9 +69,8 @@ export default function Login(req){
         </Hidden>
         <Grid item xs={12} md={6} className={classes.gridRight}>
             <Switch>
-                <Route path="/signin" component={SignIn} />
-                <Route path="/signup" component={SignUp} />
-                {/* <Route path="/forgot" /> */}
+                <Route path="/signin" component={(req)=><SignIn {...req} />} />
+                <Route path="/signup" component={(req)=><SignUp {...req} />} />
             </Switch>
         </Grid>
     </Grid>);

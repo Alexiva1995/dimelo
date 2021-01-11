@@ -11,11 +11,9 @@ import {
     IconButton,
     FormControl,
     InputAdornment,
-    Grid,
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
-
 
 const useStyles = makeStyles({
     root:{
@@ -55,9 +53,17 @@ const useStyles = makeStyles({
     Toolbar:{ marginTop:'auto', justifyContent:'center', },
 });
 
-export default function SignIn(){
-    const [ showPass, setShowPass ] = React.useState(null);
+
+
+export default function SignUp(req){
     const classes = useStyles();
+    const [ showPass, setShowPass ] = React.useState(null);
+    const [ inputs, setInput ] = React.useState(req.location.state);
+    const inputProps = (key)=>({
+        defaultValue:inputs[key],
+        onChange:({target:{value}})=>setInput(prev=>({...prev, [key]:value})),
+    });
+
     return (<Container className={classes.root}>
         <div className={classes.header}>
             <Typography color="primary" variant="h3">Regístrate ahora</Typography>
@@ -66,12 +72,12 @@ export default function SignIn(){
             </Typography>
         </div>
         <div className={classes.body}>
-            <TextField color="primary" fullWidth id="input-user" label="Usuario" />
+            <TextField {...inputProps('user')} color="primary" fullWidth id="input-user" label="Usuario" />
             <FormControl fullWidth>
                 <InputLabel htmlFor="input-password">Contraseña</InputLabel>
                 <Input id="input-password"
+                    { ...inputProps('password') }
                     type={showPass?'text':'password'}
-                    defaultValue=""
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -81,20 +87,17 @@ export default function SignIn(){
                             </IconButton>
                         </InputAdornment>} />
             </FormControl>
-            <TextField color="primary" fullWidth id="input-name" label="Nombres" />
-            <TextField color="primary" fullWidth id="input-lastname" label="Apellidos" />
-            <TextField color="primary" fullWidth id="input-document" label="Cedula" />
-            <TextField color="primary" fullWidth id="input-age" label="Edad" />
+            <TextField {...inputProps('name')} color="primary" fullWidth id="input-name" label="Nombres" />
+            <TextField {...inputProps('lastname')} color="primary" fullWidth id="input-lastname" label="Apellidos" />
+            <TextField {...inputProps('document')} color="primary" fullWidth id="input-document" label="Cedula" />
+            <TextField {...inputProps('age')} color="primary" fullWidth id="input-age" label="Edad" />
             <div className="legend">
-                Al continuar acepto las <a href="#">políticas de uso de datos y privacidad.</a>
+                Al continuar acepto las&nbsp;<strong href="#">políticas de uso de datos y privacidad.</strong>
             </div>
             <div className="legend">
-                <Button variant="contained" disableElevation color="primary" className={classes.Button}>
+                <Button variant="contained" disableElevation color="primary" className={classes.Button} onClick={()=>req.history.push('/signup-more', inputs)}>
                     <Typography color="inherit" component="span">Continuar</Typography>
                 </Button>
-            </div>
-            <div className="legend">
-                Al continuar acepto las <a href="#">políticas de uso de datos y privacidad.</a>
             </div>
         </div>
         <Toolbar className={classes.Toolbar}>
