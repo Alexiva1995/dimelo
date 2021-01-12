@@ -1,5 +1,5 @@
 {
-  "name": "dimelo.com",
+  "name": "dimelo.vip",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,8 +15,9 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "update": "npm update @arcaela/aurora",
+    "start-dev": "react-scripts start",
+    "start-prod": "react-scripts build && serve -s build",
+    "update-arcaela": "npm update @arcaela/aurora",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

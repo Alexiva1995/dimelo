@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import InputHooks from './InputsHelper';
 import BrandPNG from '../../dist/images/brand.svg';
 import { FiberManualRecord, } from '@material-ui/icons';
-import WatermarkIMG from '../../dist/images/watermark.svg';
+import WatermarkDarkIMG from '../../dist/images/watermark-dark.svg';
 import {
     Button,
     Toolbar,
@@ -21,10 +21,10 @@ const useStyles = makeStyles(theme=>({
     root:{
         display:'flex',
         minHeight:'100vh',
-        backgroundColor:`${theme.palette.primary.dark}`,
-        backgroundImage:`url(${WatermarkIMG})`,
         backgroundSize:200,
         backgroundRepeat:'space',
+        backgroundColor:`${theme.palette.primary.dark}`,
+        backgroundImage:`url(${WatermarkDarkIMG})`,
         '& a':{textDecoration:'none', color:'inherit'},
     },
     container:{
@@ -36,24 +36,11 @@ const useStyles = makeStyles(theme=>({
         flexDirection:'column',
         justifyContent:'flex-start',
         backgroundColor:theme.palette.primary.main,
-        '& > img':{ maxWidth:200, margin:'0 auto', marginTop:30, },
-    },
-
-    containerWelcome:{
-        margin:'auto',
-        color:'#FFF',
-        borderRadius:20,
-        padding:'20px',
-        display:'flex',
-        flexDirection:'column',
-        alignContent:'center',
-        justifyContent:'center',
-        textAlign:'center',
-        backgroundColor:theme.palette.primary.main,
-        '& > img':{ maxWidth:200, margin:'0 auto', marginTop:30, },
-        '& > .MuiTypography-h5':{ margin:'20px auto', },
-        '& > .MuiButton-root':{ margin:'40px auto',color:'#fff' },
-        '& > .MuiTypography-subtitle2':{ },
+        '& > img':{ maxWidth:200, margin:'30px auto 0', },
+        [theme.breakpoints.down('xs')]:{
+            backgroundColor:'transparent',
+            '& > img':{ margin:'0 auto', },
+        },
     },
     header:{
         marginTop:30,
@@ -61,28 +48,29 @@ const useStyles = makeStyles(theme=>({
         flexWrap:'wrap',
         alignItems:'center',
         '& > span':{ marginLeft:'auto', textDecoration:'underline', fontWeight:100, cursor:'pointer',},
-        '& .MuiTypography-subtitle2':{
-            marginTop:10,
-            fontSize:'1.175rem',
-            fontWeight:'300',
+        '& .MuiTypography-subtitle2':{ marginTop:10, fontSize:'1.175rem', fontWeight:'300', },
+        [theme.breakpoints.down('xs')]:{
+            '& .MuiTypography-subtitle2':{ marginTop:0, fontSize:'.87rem',},
         },
     },
-    body:{ margin:'auto 0', _marginTop:30, },
     hasStep:{
         display:'flex',
         flexWrap:'wrap',
         '& .MuiFormControl-root':{ maxWidth:'45%', minWidth:200, },
         '& .MuiFormControl-root:nth-child(odd)':{ marginRight:'auto',marginBottom:20, },
-        '& > .legend':{ display:'flex', flexBasis:'100%', padding:'10px 0', marginBottom:10, },
         '&:not(.active)':{ display:'none', },
-        '&:last-child':{ 
-            '& .MuiFormControl-root':{ maxWidth:'unset', minWidth:200, },
-            
+        '&:last-child':{
+            '& .MuiFormControl-root':{ maxWidth:'100%',},
+            '& label + .MuiInput-formControl':{marginTop:35,},
+        },
+        [theme.breakpoints.down('xs')]:{
+            '& .MuiFormControl-root':{ maxWidth:'unset', },
         },
     },
     actions:{
         display:'flex',
         textAlign:'center',
+        margin:'auto 0',
         flexDirection:'column',
         '& .MuiButton-root':{ color:'#fff', marginLeft:'auto', },
         '& .MuiButton-containedPrimary':{backgroundColor:'#1c4f75',},
@@ -107,9 +95,24 @@ const InputWhite = withStyles({
 })(TextField);
 
 
-
-
-function WelcomeComponent(){
+const WelcomeComponent =  withStyles(theme=>({
+    root:{
+        margin:'auto',
+        color:'#FFF',
+        borderRadius:20,
+        padding:'20px',
+        display:'flex',
+        flexDirection:'column',
+        alignContent:'center',
+        justifyContent:'center',
+        textAlign:'center',
+        backgroundColor:theme.palette.primary.main,
+        '& > img':{ maxWidth:200, margin:'0 auto', marginTop:30, },
+        '& > .MuiTypography-h5':{ margin:'20px auto', },
+        '& > .MuiButton-root':{ margin:'40px auto',color:'#fff' },
+        '& > .MuiTypography-subtitle2':{ },
+    },
+}))(function WelcomeComponent(){
     const classes = useStyles();
     return (<Container maxWidth="xs" className={classes.containerWelcome}>
         <img alt="Brand" src={BrandPNG} className={classes.brand} />
@@ -123,7 +126,9 @@ function WelcomeComponent(){
             </Typography>
         </Button>
     </Container>);
-}
+});
+
+
 
 export default function SignUpMore(req){
     const classes = useStyles();
@@ -131,7 +136,6 @@ export default function SignUpMore(req){
     const [ activeStep, setActiveStep ] = React.useState(0);
     const [ globalError, setGlobalError ] = React.useState('');
     const [ welcome, setWelcome ] = React.useState(false);
-
     const handleBack = ()=>{
         if(activeStep===0) req.history.goBack();
         else setActiveStep(n=>n-1);
@@ -161,8 +165,7 @@ export default function SignUpMore(req){
                     redirect: 'follow'
                 })
                 .then((data)=>{
-                    resetInputs({user:null});
-                    setWelcome(data);
+                    resetInputs(()=>setWelcome(data));
                 })
             }
         });
@@ -179,22 +182,22 @@ export default function SignUpMore(req){
             </div>
             <div className={classes.body}>
                 <div className={clsx(classes.hasStep,{active:activeStep===0})}>
-                    <InputWhite {...inputProps('address')} fullWidth id="input-address" label="Direccion" />
-                    <InputWhite {...inputProps('reside_municipality')} fullWidth id="input-address" label="Municipio donde resides" />
-                    <InputWhite {...inputProps('commune')} fullWidth id="input-address" label="Comuna o corregimiento" />
-                    <InputWhite {...inputProps('neighborhood')} fullWidth id="input-address" label="Barrio" />
-                    <InputWhite {...inputProps('phone')} fullWidth id="input-address" label="Telefono fijo" type="number"/>
-                    <InputWhite {...inputProps('cell_phone')} fullWidth id="input-address" label="Celular" type="number" />
-                    <InputWhite {...inputProps('email')} fullWidth id="input-address" label="Correo electrónico" type="email" />
+                    <InputWhite {...inputProps('address')} label="Direccion" />
+                    <InputWhite {...inputProps('reside_municipality')} label="Municipio donde resides" />
+                    <InputWhite {...inputProps('commune')} label="Comuna o corregimiento" />
+                    <InputWhite {...inputProps('neighborhood')} label="Barrio" />
+                    <InputWhite {...inputProps('phone')} label="Telefono fijo" type="number"/>
+                    <InputWhite {...inputProps('cell_phone')} label="Celular" type="number" />
+                    <InputWhite {...inputProps('email')} label="Correo electrónico" type="email" />
                 </div>
                 <div className={clsx(classes.hasStep,{active:activeStep===1})}>
-                    <InputWhite {...inputProps('voting_municipality')} fullWidth id="input-address" label="Municipio donde votas" />
-                    <InputWhite {...inputProps('voting_point')} fullWidth id="input-address" label="Puesto de votacion" />
-                    <InputWhite {...inputProps('voting_table')} fullWidth id="input-address" label="Mesa de votacion" />
+                    <InputWhite {...inputProps('voting_municipality')} label="Municipio donde votas" />
+                    <InputWhite {...inputProps('voting_point')} label="Puesto de votacion" />
+                    <InputWhite {...inputProps('voting_table')} label="Mesa de votacion" />
                 </div>
                 <div className={clsx(classes.hasStep,{active:activeStep>=2})}>
-                    <InputWhite {...inputProps('number_people_legal_age')} fullWidth id="input-address" label="¿Cuentas personas de su nucleo familiar son mayores de edad?" type="number" />
-                    <InputWhite {...inputProps('number_people_accompany_to_vote')} fullWidth id="input-address" label="¿Con cuantas personas usted cuenta para que nos acompañen en la votacion?" type="number" inputProps={{style:{marginTop:15}}} />
+                    <InputWhite {...inputProps('number_people_legal_age')} label="¿Cuentas personas de su nucleo familiar son mayores de edad?" type="number" />
+                    <InputWhite {...inputProps('number_people_accompany_to_vote')} label="¿Con cuantas personas usted cuenta para que nos acompañen en la votacion?" type="number" />
                 </div>
             </div>
             {globalError&&(<Toolbar className={classes.footer}>

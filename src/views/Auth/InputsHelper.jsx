@@ -1,29 +1,7 @@
 import React from 'react'
 
 const CurrentValues = {
-    inputs:{
-        // username:"arcaela99",
-        // password:"arcaelas123",
-        // name:"Alejandro",
-        // lastname:"Reyes",
-        // cedula:"26001714-3",
-        // age:"25",
-
-        // address:"Venezuela",
-        // reside_municipality:"Caroni",
-        // commune:"Cachamay",
-        // neighborhood:"Orinoco",
-        // phone:"02869224896",
-        // cell_phone:"04144709840",
-        // email:"arcaelareyes@gmail.com",
-
-        // voting_municipality:"Cachamay",
-        // voting_point:"Caroni",
-        // voting_table:"No lo se",
-
-        // number_people_legal_age:"1",
-        // number_people_accompany_to_vote:"1",
-    },
+    inputs:{ },
     errors:{},
 };
 export default function InputHooks(InitialValues=null){
@@ -36,7 +14,11 @@ export default function InputHooks(InitialValues=null){
     return {
         inputs,
         setInputs,
-        resetInputs:_setInputs,
+        resetInputs:(bind)=>{
+            CurrentValues.inputs = {};
+            _setInputs(CurrentValues.inputs);
+            bind();
+        },
         resetErrors:_setErrors,
         CurrentValues:InputsHelperBackup,
         isLocked:(withEmptys=true)=>{
