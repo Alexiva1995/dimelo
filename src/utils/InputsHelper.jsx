@@ -12,7 +12,7 @@ const CurrentValues = {
         'cedula',
         'age',
         'address',
-        'commune',
+        // 'commune',
         'neighborhood',
         'phone',
         'cell_phone',
@@ -73,17 +73,15 @@ function useHooks(){
         resetInputs:(value)=>resetInputs(CurrentValues.inputs=value),
         resetErrors:(value)=>resetErrors(CurrentValues.errors=value),
         locationHelper,
-        _validate(...keys){
+        validate(...keys){
             return Boolean((keys.length?keys:CurrentValues.inputsName)
             .flat().filter(name=>(errors[name] || !inputs[name])).length===0);
         },
-        _hasError(...keys){
+        hasError(...keys){
             const key = (keys.length?keys:CurrentValues.inputsName).flat()
             .filter(name=>(errors[name] || !inputs[name]));
             return key.length ? key : false;
         },
-        validate:()=>true,
-        hasError:()=>false,
         
         inputProps:key=>({
             name:key,

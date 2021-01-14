@@ -201,7 +201,7 @@ export default function SignUpMore(req){
                         {municipios.map((n,k)=>(<MenuItem key={k} value={n}>{n}</MenuItem>))}
                         </Select>
                     </FormControl>
-                    <TextField {...inputProps('commune')} label="Comuna o corregimiento" />
+                    <TextField {...inputProps('commune')} label="Comuna o corregimiento (Si aplica)" />
                     <TextField {...inputProps('neighborhood')} label="Barrio" />
                     <TextField {...inputProps('phone')} label="Teléfono fijo" type="number"/>
                     <TextField {...inputProps('cell_phone')} label="Celular" type="number" />
