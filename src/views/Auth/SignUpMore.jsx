@@ -1,19 +1,27 @@
 import clsx from 'clsx';
 import React from 'react'
 import { Link } from 'react-router-dom';
-import InputHooks from './InputsHelper';
 import BrandPNG from '../../dist/images/brand.svg';
-import { FiberManualRecord, } from '@material-ui/icons';
+import { FiberManualRecord,Info, } from '@material-ui/icons';
 import WatermarkDarkIMG from '../../dist/images/watermark-dark.svg';
 import {
     Button,
+    IconButton,
     Toolbar,
     Container,
     TextField,
     Typography,
     makeStyles,
-    withStyles,
+    Select,
+    Tooltip,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    CircularProgress,
+    ClickAwayListener,
 } from '@material-ui/core'
+import useHooks from './../../utils/InputsHelper';
+import locationHooks from './../../utils/location';
 
 
 
@@ -43,28 +51,36 @@ const useStyles = makeStyles(theme=>({
         },
     },
     header:{
-        marginTop:30,
+        margin:'30px 0 10px',
         display:'flex',
         flexWrap:'wrap',
         alignItems:'center',
         '& > span':{ marginLeft:'auto', textDecoration:'underline', fontWeight:100, cursor:'pointer',},
         '& .MuiTypography-subtitle2':{ marginTop:10, fontSize:'1.175rem', fontWeight:'300', },
-        [theme.breakpoints.down('xs')]:{
-            '& .MuiTypography-subtitle2':{ marginTop:0, fontSize:'.87rem',},
-        },
+        [theme.breakpoints.down('xs')]:{ '& .MuiTypography-subtitle2':{ marginTop:0, fontSize:'.87rem',}, },
     },
     hasStep:{
         display:'flex',
         flexWrap:'wrap',
-        '& .MuiFormControl-root':{ maxWidth:'45%', minWidth:200, },
-        '& .MuiFormControl-root:nth-child(odd)':{ marginRight:'auto',marginBottom:20, },
         '&:not(.active)':{ display:'none', },
+        '& .MuiFormControl-root':{
+            width:'45%',
+            color:'white',
+            fontWeight:300,
+            '&:nth-child(odd)':{ marginRight:'auto',},
+            '& .MuiInputBase-root, & label, & input':{color:'inherit',fontWeight:'inherit'},
+            '& .MuiInputBase-root:before,& .MuiInputBase-root:after':{ borderBottomColor:'white', },
+        },
         '&:last-child':{
             '& .MuiFormControl-root':{ maxWidth:'100%',},
             '& label + .MuiInput-formControl':{marginTop:35,},
         },
         [theme.breakpoints.down('xs')]:{
-            '& .MuiFormControl-root':{ maxWidth:'unset', },
+            '& .MuiFormControl-root':{
+                marginBottom:10,
+                width:'100%',
+                maxWidth:'unset',
+            },
         },
     },
     actions:{
@@ -84,19 +100,8 @@ const useStyles = makeStyles(theme=>({
         fontWeight:'300',
         justifyContent:'center',
     },
-}));
 
-const InputWhite = withStyles({
-  root: {
-    '& label.MuiFormLabel-root': { color: 'white', fontWeight:300, },
-    '& .MuiInput-underline:before, & .MuiInput-underline:after': { borderBottomColor: 'white', },
-    '& .MuiInput-input': { color:'white', fontWeight:300, },
-  },
-})(TextField);
-
-
-const WelcomeComponent =  withStyles(theme=>({
-    root:{
+    welcome:{
         margin:'auto',
         color:'#FFF',
         borderRadius:20,
@@ -112,69 +117,70 @@ const WelcomeComponent =  withStyles(theme=>({
         '& > .MuiButton-root':{ margin:'40px auto',color:'#fff' },
         '& > .MuiTypography-subtitle2':{ },
     },
-}))(function WelcomeComponent(){
+
+}));
+
+
+function WelcomeComponent(){
     const classes = useStyles();
-    return (<Container maxWidth="xs" className={classes.containerWelcome}>
-        <img alt="Brand" src={BrandPNG} className={classes.brand} />
+    return (<Container maxWidth="xs" className={classes.welcome}>
+        <img alt="Brand" src={BrandPNG} />
         <Typography variant="h5" color="initial">¡Registro exitoso!</Typography>
         <Typography variant="subtitle2" color="initial">
-            Gracias por completar el registro.
-        </Typography>
-        <Button color="secondary" variant="contained" component={Link} to="/signup">
+            Gracias por completar el registro. <br/>
+            A tu correo electrónico te llegará una notificación. </Typography>
+        <Button color="secondary" variant="contained" component={Link} to="/signup" style={{marginTop:10}}>
             <Typography color="inherit" component="span">
                 Registrar otra persona
             </Typography>
         </Button>
     </Container>);
-});
-
+};
 
 
 export default function SignUpMore(req){
     const classes = useStyles();
-    const { inputs, inputProps, isLocked, setErrors, resetInputs } = InputHooks(req.location.state);
     const [ activeStep, setActiveStep ] = React.useState(0);
-    const [ globalError, setGlobalError ] = React.useState('');
     const [ welcome, setWelcome ] = React.useState(false);
-    const handleBack = ()=>{
-        if(activeStep===0) req.history.goBack();
-        else setActiveStep(n=>n-1);
+    const [ tooltip, setTooltip ] = React.useState(false);
+    const {
+        inputs, setInputs, resetInputs,
+        errors, hasError, resetErrors,
+        loading, fetchAPI,
+        inputProps,
+    } = useHooks();
+    const handleInfo = ()=>{
+        setTooltip(!tooltip);
+        if(tooltip) window.open('https://wsp.registraduria.gov.co/censo/consultar/','_blank');
     };
-    const handleSignUp = ()=>{
-        return fetch("https://dimelo.vip/dimelo/api/auth/register",{
-            headers:new Headers({
-                "Accept":"application/json",
-                "Content-Type":"application/json",
-            }),
-            method: 'POST',
-            body: JSON.stringify(inputs),
-            redirect: 'follow',
-        }).then(response => response.json()).then((data)=>{
-            if(data.errors){
-                setGlobalError(data.message);
-                Object.keys(data.errors).forEach(key=>setErrors(key, data.errors[key][0]));
-            }
-            else{
-                fetch("https://dimelo.vip/dimelo/api/auth/logout", {
-                    method: 'GET',
-                    headers:{
-                        "Accept":"application/json",
-                        "Content-Type":"application/x-www-form-urlencoded",
-                        "Authorization":`Bearer ${data.access_token}`,
-                    },
-                    redirect: 'follow'
-                })
-                .then((data)=>{
-                    resetInputs(()=>setWelcome(data));
-                })
-            }
-        });
-    }
+    const GlobalError = Object.values(errors)[0] || null;
+    const municipios = locationHooks.dep.getMunOf('antioquia');
+    const groups = [
+        [ 'address', 'commune', 'neighborhood', 'phone', 'cell_phone', 'email', ],
+        [ 'voting_municipality', 'voting_point', 'voting_table', ],
+        [ 'number_people_legal_age', 'number_people_accompany_to_vote', ]
+    ];
+    const handleBack = ()=>(activeStep===0)?req.history.goBack():setActiveStep(n=>n-1);
+    const handleSignUp = ()=>fetchAPI('auth/register',{body:inputs}).then(data=>{
+        if(data.errors)
+            resetErrors(Object.entries(data.errors).reduce((err, [key, values])=>{
+                err[key]=values[0];
+                return err;
+            },{}));
+        else fetchAPI("auth/logout", {
+                method: 'GET',
+                headers:{
+                    "Authorization":`Bearer ${data.access_token}`,
+                    "Accept":"application/json", "Content-Type":"application/x-www-form-urlencoded",
+                },
+            }).then(()=>{ setWelcome(data); resetInputs({_o:12}); });
+    });
+    if(welcome) return (<div className={classes.root}> <WelcomeComponent /> </div>);
     return (<div className={classes.root}>
-        {welcome?(<WelcomeComponent />):(<Container maxWidth="sm" className={classes.container}>
+        <Container maxWidth="sm" className={classes.container}>            
             <img alt="Brand" src={BrandPNG} className={classes.brand} />
             <div className={classes.header}>
-                <Typography variant="h5" color="initial">Un poco mas...</Typography>
+                <Typography variant="h5" color="initial">Un poco más...</Typography>
                 <span onClick={handleBack}>Volver</span>
                 <Typography variant="subtitle2" color="initial">
                     Completa estos campos adicionales para terminar el registro.
@@ -182,38 +188,77 @@ export default function SignUpMore(req){
             </div>
             <div className={classes.body}>
                 <div className={clsx(classes.hasStep,{active:activeStep===0})}>
-                    <InputWhite {...inputProps('address')} label="Direccion" />
-                    <InputWhite {...inputProps('reside_municipality')} label="Municipio donde resides" />
-                    <InputWhite {...inputProps('commune')} label="Comuna o corregimiento" />
-                    <InputWhite {...inputProps('neighborhood')} label="Barrio" />
-                    <InputWhite {...inputProps('phone')} label="Telefono fijo" type="number"/>
-                    <InputWhite {...inputProps('cell_phone')} label="Celular" type="number" />
-                    <InputWhite {...inputProps('email')} label="Correo electrónico" type="email" />
+                    <TextField {...inputProps('address')} label="Dirección" />
+                    <FormControl>
+                        <InputLabel id="demo-simple-select-label">Municipio donde resides</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={inputs.reside_municipality || municipios[0] }
+                            onChange={({target:{value}})=>{
+                                resetInputs(p=>({...p, reside_municipality:value, voting_municipality:value, }));
+                            }}>
+                        {municipios.map((n,k)=>(<MenuItem key={k} value={n}>{n}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <TextField {...inputProps('commune')} label="Comuna o corregimiento" />
+                    <TextField {...inputProps('neighborhood')} label="Barrio" />
+                    <TextField {...inputProps('phone')} label="Teléfono fijo" type="number"/>
+                    <TextField {...inputProps('cell_phone')} label="Celular" type="number" />
+                    <TextField {...inputProps('email')} label="Correo Electrónico" type="email" />
                 </div>
                 <div className={clsx(classes.hasStep,{active:activeStep===1})}>
-                    <InputWhite {...inputProps('voting_municipality')} label="Municipio donde votas" />
-                    <InputWhite {...inputProps('voting_point')} label="Puesto de votacion" />
-                    <InputWhite {...inputProps('voting_table')} label="Mesa de votacion" />
+                    <FormControl>
+                        <InputLabel id="demo-simple-select-label">Municipio donde votas</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={inputs.voting_municipality || municipios[0]}
+                            onChange={({target:{value}})=>setInputs('voting_municipality', value)}
+                        >
+                        {municipios.map((n,k)=>(<MenuItem key={k} value={n}>{n}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <TextField {...inputProps('voting_point')} label="Puesto de votación"
+                        InputProps={{
+                            endAdornment:(<ClickAwayListener onClickAway={()=>setTooltip(false)}>
+                                <Tooltip
+                                    PopperProps={{
+                                        disablePortal:true,
+                                    }}
+                                    interactive
+                                    open={tooltip}
+                                    title={<div>
+                                    <Typography color="secondary" variant="h6" component="div">IMPORTANTE</Typography>
+                                    <Typography color="inherit" variant="subtitle2">
+                                        Si no tienes clara esta información, en este enlace puedes acceder a la página de la Registraduría.
+                                    </Typography>
+                                    </div>} arrow placement="top-start">
+                                  <IconButton onClick={handleInfo} color="inherit" children={<Info />} />
+                                </Tooltip>
+                            </ClickAwayListener>),                            
+                        }}
+                        />
+                    <TextField {...inputProps('voting_table')} label="Mesa de votación" type="number" />
                 </div>
                 <div className={clsx(classes.hasStep,{active:activeStep>=2})}>
-                    <InputWhite {...inputProps('number_people_legal_age')} label="¿Cuentas personas de su nucleo familiar son mayores de edad?" type="number" />
-                    <InputWhite {...inputProps('number_people_accompany_to_vote')} label="¿Con cuantas personas usted cuenta para que nos acompañen en la votacion?" type="number" />
+                    <TextField {...inputProps('number_people_legal_age')} label="¿Cuántas personas de su núcleo familiar son mayores de edad?" type="number" />
+                    <TextField {...inputProps('number_people_accompany_to_vote')} label="Número de personas con las que usted contaría para que nos acompañen en la votación" type="number" />
                 </div>
             </div>
-            {globalError&&(<Toolbar className={classes.footer}>
-                <Typography variant="body2">{globalError}</Typography>
-            </Toolbar>)}
+            {GlobalError&&(<Toolbar style={{textAlign:'center'}}>{GlobalError}</Toolbar>)}
             <div className={classes.actions}>
                 <div className={`active-step-${activeStep}`}> <FiberManualRecord /> <FiberManualRecord /> <FiberManualRecord /> </div>
-                { activeStep<2 ? <Button variant="contained" disabled={isLocked(false)} color="primary" onClick={()=>setActiveStep(prev=>prev+1)}>Continuar</Button> : null}
-                { activeStep>=2? <Button variant="contained" disabled={isLocked()} color="secondary" onClick={handleSignUp} >
-                    <Typography color="inherit" component="span">Registrate</Typography>
-                </Button>:null}
+                {activeStep<2?(<Button variant="contained" color="primary" onClick={()=>setActiveStep(p=>p+1)} disabled={loading || Boolean(hasError(groups[activeStep]))} >
+                    Continuar
+                </Button>):null}
+                {activeStep>=2?(<Button variant="contained" color='secondary' onClick={handleSignUp} disabled={ loading || Boolean(hasError()) }>
+                    {loading?<CircularProgress size={32}/>:(<Typography color="inherit" component="span">Registrate</Typography>)}
+                </Button>):null}
             </div>
             <Toolbar className={classes.footer}>
                 ¿Ya tienes una cuenta?&nbsp;<Typography component={Link} to="/signin">Ingresa</Typography>
-            </Toolbar>        
-        </Container>)}
+            </Toolbar>            
+        </Container>
     </div>);
-
 }
