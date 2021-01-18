@@ -8,12 +8,10 @@ import {
 import WatermarkIMG from '../../dist/images/watermark.svg';
 import WatermarkDarkIMG from '../../dist/images/watermark-dark.svg';
 import BrandIMG from '../../dist/images/brand.svg';
-import { Switch, Route } from 'react-router-dom';
 
 // Formularios
-import SignIn from './SignIn';
-import SignUp from './SignUp';
-import SignUpMore from './SignUpMore';
+import { SignUp, SignupMore } from './SignUp';
+
 
 const useStyles = makeStyles(theme=>({
     root:{ minHeight:'100vh', },
@@ -46,9 +44,8 @@ const useStyles = makeStyles(theme=>({
 
 export default function Auth(req){
     const classes = useStyles();
-return (req.location.pathname==='/signup-more')
-    ?<SignUpMore {...req} />
-    :(<Grid container className={classes.root}>
+    if(req.location.pathname==='/signup-more') return <SignupMore {...req} />;
+    return (<Grid container className={classes.root}>
         <Hidden smDown>
             <Grid item xs={12} md={6} className={classes.gridLeft}>
                 <Typography variant="h3">Bienvenido</Typography>
@@ -58,10 +55,7 @@ return (req.location.pathname==='/signup-more')
             </Grid>
         </Hidden>
         <Grid item xs={12} md={6} className={classes.gridRight}>
-            <Switch>
-                <Route path="/signin" component={(req)=><SignIn {...req} />} />
-                <Route path="/signup" component={(req)=><SignUp {...req} />} />
-            </Switch>
+            {req.location.pathname==='/signup' && <SignUp {...req}/>}
         </Grid>
     </Grid>);
 }

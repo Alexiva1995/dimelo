@@ -1,6 +1,4 @@
 import { Theme } from '@arcaela/aurora/hooks';
-
-
 Theme.create('DEFAULT', {
     palette:{
         primary:{

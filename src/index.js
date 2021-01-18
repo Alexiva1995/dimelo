@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom'
 import { AuroraJS } from '@arcaela/aurora';
+// import './config/firebase'
 import './config/themes'
 import './config/routes'
 ReactDOM.render((<React.StrictMode>
